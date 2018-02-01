@@ -59,10 +59,8 @@ func main() {
 		}
 	}()
 	writeChunks(fi, w)
-	log.Println("chunks written to " + archiveFilename + " in google bucket")
 	verifyFileInBucket(ctx, obj)
 	removeLocalFile(archiveFilename)
-
 }
 
 //removeLocalFile deletes the file with the specified filename
@@ -105,6 +103,7 @@ func writeChunks(fi *os.File, w *storage.Writer) {
 			log.Fatal(err.Error())
 		}
 	}
+	log.Println("chunks written to google bucket")
 	// Close, just like writing a file.
 	if err := w.Close(); err != nil {
 		log.Fatal(err.Error())
