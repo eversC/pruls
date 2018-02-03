@@ -10,6 +10,8 @@ import (
 	"os"
 	"time"
 
+	"golang.org/x/sys/unix"
+
 	"cloud.google.com/go/storage"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mholt/archiver"
@@ -155,15 +157,29 @@ func bucketObject(ctx context.Context, accountKeyAbsPath, bucketName,
 
 //validateEnvConfig performs validation on envconfig
 func validateEnvConfig(s Specification) (err error) {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Println("issue getting current working directory", err.Error())
+	}
+	accKeyAbsPath := s.AccountKeyAbsPath
+	targetDirAbsPath := s.TargetDirAbsPath
 	switch {
-	case !pathStatBool(s.AccountKeyAbsPath):
+	case !pathStatBool(accKeyAbsPath):
 		err = errors.New("google account key (e.g. .json) must exist, not found " +
-			"at: " + s.AccountKeyAbsPath)
+			"at: " + accKeyAbsPath)
 		break
-	case !pathStatBool(s.TargetDirAbsPath):
+	case !pathStatBool(targetDirAbsPath):
 		err = errors.New("backup target dir must exist, not found at: " +
-			s.TargetDirAbsPath)
+			targetDirAbsPath)
 		break
+	case !accessible(accKeyAbsPath, unix.R_OK):
+		err = errors.New("lack of read access to " + accKeyAbsPath + " detected")
+		break
+	case !accessible(targetDirAbsPath, unix.R_OK):
+		err = errors.New("lack of read access to " + targetDirAbsPath + " detected")
+		break
+	case !accessible(currentDir, unix.W_OK):
+		err = errors.New("lack of write access to current dir: " + currentDir)
 	}
 	return
 }
@@ -172,5 +188,10 @@ func validateEnvConfig(s Specification) (err error) {
 func pathStatBool(path string) (exists bool) {
 	_, err := os.Stat(path)
 	exists = err == nil
+	return
+}
+
+func accessible(path string, accessLevel uint32) (accessible bool) {
+	accessible = unix.Access(path, unix.R_OK) == nil
 	return
 }
