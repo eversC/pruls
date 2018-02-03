@@ -36,3 +36,4 @@ it's recommended to stick to the `principle of least privilege` wrt required use
 
 * https://github.com/kelseyhightower/envconfig is used for env var config
 * https://github.com/mholt/archiver for .tar.gz functionality
+* the local .tar.gz archive is deleted prior to the binary exiting
