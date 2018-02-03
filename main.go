@@ -59,10 +59,10 @@ func main() {
 		if err = fi.Close(); err != nil {
 			log.Fatal(err.Error())
 		}
+		removeLocalFile(archiveFilename)
 	}()
 	writeChunks(fi, w)
 	verifyFileInBucket(ctx, obj)
-	removeLocalFile(archiveFilename)
 }
 
 //removeLocalFile deletes the file with the specified filename
