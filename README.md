@@ -18,7 +18,7 @@ download [binary](https://github.com/eversC/pruls/releases)
 
 it's then simply a case of setting env vars (see below) and running the binary, e.g. `"./pruls"`
 
-it's recommended to stick to the `principle of least privilege` wrt required user access mentioned above. Create a new user specifically, and only give it the minimum access possible. The same applies to creating a google service account specifically for these backups)
+it's recommended to stick to the `principle of least privilege` wrt required user access mentioned above. Create a new user specifically, and only give it the minimum access possible. The same applies to creating a google service account specifically for these backups.
 
 ### env vars
 
