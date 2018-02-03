@@ -13,12 +13,12 @@ download [binary](https://github.com/eversC/pruls/releases)
 * binary must exist on the host where the `targetdir` exists
 * user running the binary must have:
     * read access to the `targetdir`
-    * read access to the `accountKey`
+    * read access to the `accountKey` (usually your google .json key)
     * write access to the current work directory
 
 it's then simply a case of setting env vars (see below) and running the binary, e.g. `"./pruls"`
 
-it's recommended to stick to the `principle of least privilege` wrt required user access mentioned above. Create a new user specifically, and only give it the minimum access possible.
+it's recommended to stick to the `principle of least privilege` wrt required user access mentioned above. Create a new user specifically, and only give it the minimum access possible. The same applies to creating a google service account specifically for these backups)
 
 ### env vars
 
