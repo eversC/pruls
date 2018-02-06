@@ -13,8 +13,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"cloud.google.com/go/storage"
+	"github.com/eversC/archiver"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/mholt/archiver"
 	"google.golang.org/api/option"
 )
 
