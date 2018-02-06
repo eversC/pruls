@@ -14,6 +14,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/eversC/archiver"
+	"github.com/kardianos/osext"
 	"github.com/kelseyhightower/envconfig"
 	"google.golang.org/api/option"
 )
@@ -46,14 +47,15 @@ func main() {
 	}
 	ctx := context.Background()
 	archiveFilename := archiveFilename(s.FilePrefix, s.AppName)
+	archiveFilepath := archiveFilepath(archiveFilename)
 	obj := bucketObject(ctx, s.AccountKeyAbsPath, s.BucketName, archiveFilename)
 	w := obj.NewWriter(ctx)
-	err = archiver.TarGz.Make(archiveFilename, []string{s.TargetDirAbsPath})
+	err = archiver.TarGz.Make(archiveFilepath, []string{s.TargetDirAbsPath})
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	// open input file
-	fi, err := os.Open(archiveFilename)
+	fi, err := os.Open(archiveFilepath)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -62,7 +64,7 @@ func main() {
 		if err = fi.Close(); err != nil {
 			log.Fatal(err.Error())
 		}
-		removeLocalFile(archiveFilename)
+		removeLocalFile(archiveFilepath)
 	}()
 	writeChunks(fi, w)
 	verifyFileInBucket(ctx, obj)
@@ -115,9 +117,21 @@ func writeChunks(fi *os.File, w *storage.Writer) {
 	}
 }
 
+//archiveFilepath creates a filepath from the directory path of the pruls
+// binary, appended with forward slash and the provided archiveFilename
+func archiveFilepath(archiveFilename string) (filepath string) {
+	var buffer bytes.Buffer
+	currentDir, _ := currentDir()
+	buffer.WriteString(currentDir)
+	buffer.WriteString("/")
+	buffer.WriteString(archiveFilename)
+	filepath = buffer.String()
+	return
+}
+
 //archiveFilename creates a filename from current time, file prefix (if exists),
 // appname, suffix and fileExtension (in that order)
-func archiveFilename(filePrefix, appName string) (filename string) {
+func archiveFilename(fileprefix, appname string) (filename string) {
 	var buffer bytes.Buffer
 	var timeFormatBuff bytes.Buffer
 	timeFormatBuff.WriteString("2006")
@@ -131,11 +145,11 @@ func archiveFilename(filePrefix, appName string) (filename string) {
 	timeFormatBuff.WriteString("05")
 	buffer.WriteString(time.Now().Format(timeFormatBuff.String()))
 	buffer.WriteString(filenameSep)
-	if filePrefix != "" {
-		buffer.WriteString(filePrefix)
+	if fileprefix != "" {
+		buffer.WriteString(fileprefix)
 		buffer.WriteString(filenameSep)
 	}
-	buffer.WriteString(appName)
+	buffer.WriteString(appname)
 	buffer.WriteString(filenameSep)
 	buffer.WriteString(filenameSuffix)
 	buffer.WriteString(fileExtension)
@@ -160,9 +174,9 @@ func bucketObject(ctx context.Context, accountKeyAbsPath, bucketName,
 
 //validateEnvConfig performs validation on envconfig
 func validateEnvConfig(s Specification) (err error) {
-	currentDir, err := os.Getwd()
+	currentDir, _ := currentDir()
 	if err != nil {
-		log.Println("issue getting current working directory", err.Error())
+		log.Println("issue getting current directory", err.Error())
 	}
 	accKeyAbsPath := s.AccountKeyAbsPath
 	targetDirAbsPath := s.TargetDirAbsPath
@@ -185,6 +199,10 @@ func validateEnvConfig(s Specification) (err error) {
 		err = errors.New("lack of write access to current dir: " + currentDir)
 	}
 	return
+}
+
+func currentDir() (currentDir string, err error) {
+	return osext.ExecutableFolder()
 }
 
 //pathStatBool returns true if the path exists
