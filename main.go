@@ -192,6 +192,6 @@ func pathStatBool(path string) (exists bool) {
 }
 
 func accessible(path string, accessLevel uint32) (accessible bool) {
-	accessible = unix.Access(path, unix.R_OK) == nil
+	accessible = unix.Access(path, accessLevel) == nil
 	return
 }
