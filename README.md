@@ -14,7 +14,7 @@ download [binary](https://github.com/eversC/pruls/releases)
 * user running the binary must have:
     * read access to the `targetdir`
     * read access to the `accountKey` (usually your google .json key)
-    * write access to the current work directory
+    * write access to the directory where the pruls binary resides
 
 it's then simply a case of setting env vars (see below) and running the binary, e.g. `"./pruls"`
 
@@ -35,5 +35,7 @@ it's recommended to stick to the `principle of least privilege` wrt required use
 ### notes
 
 * https://github.com/kelseyhightower/envconfig is used for env var config
-* https://github.com/mholt/archiver for .tar.gz functionality
+* https://github.com/eversC/archiver (which is a fork of https://github.com/mholt/archiver) for .tar.gz functionality
+* if any errors are encounted tarring specific files, they're skipped, and process continues to next file (hence the 'archiver' fork above)
+* https://github.com/kardianos/osext for grabbing filepath of dir containing pruls binary
 * the local .tar.gz archive is deleted prior to the binary exiting
