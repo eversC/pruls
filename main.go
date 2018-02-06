@@ -49,6 +49,9 @@ func main() {
 	obj := bucketObject(ctx, s.AccountKeyAbsPath, s.BucketName, archiveFilename)
 	w := obj.NewWriter(ctx)
 	err = archiver.TarGz.Make(archiveFilename, []string{s.TargetDirAbsPath})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 	// open input file
 	fi, err := os.Open(archiveFilename)
 	if err != nil {
