@@ -194,6 +194,7 @@ func pathStatBool(path string) (exists bool) {
 	return
 }
 
+//accessible returns true if the path specified has the access level specified
 func accessible(path string, accessLevel uint32) (accessible bool) {
 	accessible = unix.Access(path, accessLevel) == nil
 	return
